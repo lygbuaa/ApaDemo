@@ -25,8 +25,18 @@
 *.la
 *.a
 *.lib
+ort/*
 
 # Executables
 *.exe
 *.out
 *.app
+
+# image file
+dataset/*.png
+
+# model file
+model/*.onnx
+
+# intermediate files
+build/*

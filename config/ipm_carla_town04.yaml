@@ -1,0 +1,46 @@
+%YAML:1.0
+
+#common parameters
+project_rootdir: "/mnt/c/work/github/ApaDemo/"
+
+pcr_model_path: "model/pcr.onnx"
+psd_model_path: "model/psd.nms.onnx"
+output_path: "output"
+dataset_path: "dataset"
+
+image_width: 1920
+image_height: 1080
+
+homo_svc_front: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [ 7.21688186e-02,  7.43194526e-01, -3.20680487e+02,
+          -0.00000000e+00,  5.28197474e-01, -2.21239055e+02,
+          -0.00000000e+00,  2.32248307e-03, -7.85620124e-01]
+
+homo_svc_left: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [ -1.73074905e-16,  6.65688460e-01, -2.67747762e+02,
+          -7.21688186e-02,  7.35762581e-01, -1.79602371e+02,
+          -5.75643254e-19,  2.32248307e-03, -7.85620124e-01]
+
+homo_svc_rear: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [-7.21688186e-02,  7.43194526e-01, -1.82116355e+02,
+         -8.83813127e-18,  9.61907548e-01, -2.82814779e+02,
+         -5.56058240e-35,  2.32248307e-03, -7.85620124e-01]
+
+homo_svc_right: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [1.70028632e-16,  8.20700592e-01, -2.35049080e+02,
+         7.21688186e-02,  7.35762581e-01, -3.18166503e+02,
+         5.37389826e-19,  2.32248307e-03, -7.85620124e-01]
+
+delay_svc_right: 0.0
