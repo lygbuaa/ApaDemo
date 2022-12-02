@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <libgen.h>
 #include <chrono>
+#include "viwo_utils.h"
 
 namespace psdonnx
 {
@@ -45,17 +46,20 @@ public:
     }
 
     static cv::Mat crop(const cv::Mat& img, const cv::Rect& roi){
+        HANG_STOPWATCH();
         // specifies the region of interest in Rectangle form
         return img(roi).clone(); 
     }
 
     static cv::Mat resize(const cv::Mat& img, const int out_w, const int out_h){
+        HANG_STOPWATCH();
         cv::Mat resized_img;
         cv::resize(img, resized_img, cv::Size(out_w, out_h), 0, 0, cv::INTER_LINEAR);
         return resized_img;
     }
 
     static cv::Mat normalize(const cv::Mat& img){
+        HANG_STOPWATCH();
         cv::Mat norm_img;
         img.convertTo(norm_img, CV_32FC3, 1.0f/255, 0.0f);  //divided by 255
         cv::Vec3f norm_pixel = norm_img.at<cv::Vec3f>(0, 0);
@@ -65,6 +69,7 @@ public:
 
     /* input img should be rgb format */
     static cv::Mat standardize(const cv::Mat& img){
+        HANG_STOPWATCH();
         static const float rgb_mean[3] = {131.301f, 129.137f, 131.598f};
         static const float rgb_std[3] = {59.523f, 58.877f, 59.811f};
         

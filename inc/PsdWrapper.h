@@ -14,12 +14,17 @@ class PsdWrapper
 {
 public:
     std::unique_ptr<OnnxWrapper> onnx_wrapper_;
+    cv::VideoWriter video_writer_;
 
 public:
     PsdWrapper(){
         onnx_wrapper_ = std::unique_ptr<OnnxWrapper>(new OnnxWrapper());
+        //CV_FOURCC('M', 'J', 'P', 'g')
+        video_writer_.open("/mnt/c/work/github/ApaDemo/output/tmp.mp4", cv::VideoWriter::fourcc('D', 'I', 'V', 'X'), 2, cv::Size(640, 640), true);
     }
-    ~PsdWrapper(){}
+    ~PsdWrapper(){
+        video_writer_.release();
+    }
 
     bool load_model(const std::string& pcr_path, const std::string& psd_path){
         onnx_wrapper_ -> load_pcr_model(pcr_path);
@@ -48,6 +53,9 @@ public:
         cv::putText(img, tmp, org, cv::FONT_HERSHEY_DUPLEX, 0.6, yellow, 1);
         
         for(Parklot_t parklot : det.parklots){
+            if(parklot.score < 0.5f){
+                continue;
+            }
             cv::Scalar line_color(0, 0, 255);
             bool is_empty = (parklot.label == 0);
             if(is_empty){
@@ -74,7 +82,8 @@ public:
             cv::putText(img, tmp, org, cv::FONT_HERSHEY_DUPLEX, 0.6, yellow, 1);
         }
 
-        cv::imwrite(save_path, img);
+        // cv::imwrite(save_path, img);
+        video_writer_ << img;
     }
 
     std::string gen_save_name(const std::string input_img_path){

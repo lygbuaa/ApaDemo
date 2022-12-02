@@ -7,6 +7,7 @@
 #include <onnxruntime_c_api.h>
 #include <onnxruntime_cxx_api.h>
 #include "PreProcessor.h"
+#include "viwo_utils.h"
 
 namespace psdonnx
 {
@@ -98,6 +99,8 @@ public:
         cv::Mat resized_img = PreProcessor::resize(croped_img, PCR_W, PCR_H);
         cv::Mat stand_img = PreProcessor::standardize(resized_img);
 
+        HANG_STOPWATCH();
+
         /* prepare input data */
         std::vector<const char*>& input_node_names = g_pcr_s_.input_node_names;
         std::vector<std::vector<int64_t>>& input_node_dims = g_pcr_s_.input_node_dims;
@@ -175,9 +178,12 @@ public:
         /* define input tensor size, could retrieve from g_psd_s_, too */
         static constexpr int PSD_W = 640;
         static constexpr int PSD_H = 640;
-        /* preprocess */
-        cv::Mat resized_img = PreProcessor::resize(img, PSD_W, PSD_H);
+        /* preprocess, we don't need resize */
+        // cv::Mat resized_img = PreProcessor::resize(img, PSD_W, PSD_H);
+        const cv::Mat& resized_img = img;
         cv::Mat norm_img = PreProcessor::normalize(resized_img);
+
+        HANG_STOPWATCH();
 
         /* prepare input data */
         std::vector<const char*>& input_node_names = g_psd_s_.input_node_names;

@@ -15,11 +15,13 @@ src/main.cc
 )
 SET(INCLUDE_LIST
     ${PROJECT_SOURCE_DIR}/inc/
+    # ${PROJECT_SOURCE_DIR}/ort/onnxruntime-linux-aarch64-1.13.1/include
     ${PROJECT_SOURCE_DIR}/ort/onnxruntime-linux-x64-1.13.1/include
 )
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+# set(ONNXRUNTIME_LIB ${CMAKE_SOURCE_DIR}/ort/onnxruntime-linux-aarch64-1.13.1/lib/libonnxruntime.so)
 set(ONNXRUNTIME_LIB ${CMAKE_SOURCE_DIR}/ort/onnxruntime-linux-x64-1.13.1/lib/libonnxruntime.so)
 
 find_package(OpenCV REQUIRED)
