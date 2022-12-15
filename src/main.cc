@@ -32,6 +32,7 @@ void do_work(){
     std::unique_ptr<IpmComposer> ptr_ipm_composer(new IpmComposer());
     // ptr_ipm_composer->SetHomography(cpl.homo_svc_front_, cpl.homo_svc_left_, cpl.homo_svc_rear_, cpl.homo_svc_right_);
     ptr_ipm_composer->SetParams(cpl.ipm_params_);
+    ptr_ipm_composer->ReadCarModel(cpl.car_top_image_path_);
 
     std::unique_ptr<psdonnx::PsdWrapper> ptr_psd_wrapper(new psdonnx::PsdWrapper());
     // ptr_psd_wrapper->load_model(cpl.pcr_model_path_, cpl.psd_model_path_);

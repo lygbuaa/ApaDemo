@@ -7,6 +7,7 @@ pcr_model_path: "model/pcr.onnx"
 psd_model_path: "model/psd.nms.onnx"
 output_path: "output"
 dataset_path: "dataset"
+car_top_image_path: "assets/car_top.png"
 
 image_width: 1920
 image_height: 1080

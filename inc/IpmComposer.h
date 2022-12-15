@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include "viwo_utils.h"
 #include "CvParamLoader.h"
+#include "PreProcessor.h"
 
 enum class SvcIndex_t : int{
     VOID = -1,
@@ -31,49 +32,13 @@ public:
 
     static constexpr float DT_THRESHOLD_SEC_ = 0.02f;
     static constexpr int BUFFER_MAX_ = 10;
-    // static constexpr int PARAMS_.BEV_H_ = 640;
-    // static constexpr int PARAMS_.BEV_W_ = 640;
-    // static constexpr float PARAMS_.BEV_XMAX_ = 16.0;
-    // static constexpr float PARAMS_.BEV_YMAX_ = 16.0;
-    /* define center point of cameras, 1280*1280, 32*32m */
-    // static constexpr float PARAMS_.SVC_FRONT_X0_ = 640.0f;
-    // static constexpr float PARAMS_.SVC_FRONT_Y0_ = 536.8f;
-    // static constexpr float PARAMS_.SVC_LEFT_X0_ = 596.0f;
-    // static constexpr float PARAMS_.SVC_LEFT_Y0_ = 636.8f;
-    // static constexpr float PARAMS_.SVC_REAR_X0_ = 640.0f;
-    // static constexpr float PARAMS_.SVC_REAR_Y0_ = 744.8f;
-    // static constexpr float PARAMS_.SVC_RIGHT_X0_ = 684.0f;
-    // static constexpr float PARAMS_.SVC_RIGHT_Y0_ = 636.8f;
-
-    /* define center point of cameras, 1080*360, 54*18m */
-    // static constexpr float PARAMS_.SVC_FRONT_X0_ = 180.0f;
-    // static constexpr float PARAMS_.SVC_FRONT_Y0_ = 488.4f;
-    // static constexpr float PARAMS_.SVC_LEFT_X0_ = 158.0f;
-    // static constexpr float PARAMS_.SVC_LEFT_Y0_ = 538.4f;
-    // static constexpr float PARAMS_.SVC_REAR_X0_ = 180.0f;
-    // static constexpr float PARAMS_.SVC_REAR_Y0_ = 592.4f;
-    // static constexpr float PARAMS_.SVC_RIGHT_X0_ = 202.0f;
-    // static constexpr float PARAMS_.SVC_RIGHT_Y0_ = 538.4f;
-
-    /* define center point of cameras, 640*640, 16*16m */
-    // static constexpr float PARAMS_.SVC_FRONT_X0_ = 320.0f;
-    // static constexpr float PARAMS_.SVC_FRONT_Y0_ = 216.8f;
-    // static constexpr float PARAMS_.SVC_LEFT_X0_ = 276.0f;
-    // static constexpr float PARAMS_.SVC_LEFT_Y0_ = 316.8f;
-    // static constexpr float PARAMS_.SVC_REAR_X0_ = 320.0f;
-    // static constexpr float PARAMS_.SVC_REAR_Y0_ = 424.8f;
-    // static constexpr float PARAMS_.SVC_RIGHT_X0_ = 364.0f;
-    // static constexpr float PARAMS_.SVC_RIGHT_Y0_ = 316.8f;
 
 private:
-    // cv::Mat PARAMS_.HOMO_SVC_FRONT_;
-    // cv::Mat PARAMS_.HOMO_SVC_LEFT_;
-    // cv::Mat PARAMS_.HOMO_SVC_REAR_;
-    // cv::Mat PARAMS_.HOMO_SVC_RIGHT_;
     cv::Mat ipm_mask_svc_front_;
     cv::Mat ipm_mask_svc_left_;
     cv::Mat ipm_mask_svc_rear_;
     cv::Mat ipm_mask_svc_right_;
+    cv::Mat car_top_view_;
 
 public:
     IpmComposer() {
@@ -99,18 +64,18 @@ public:
         GenIpmMasksBow1();
     }
 
-    // void SetHomography(cv::Mat& homo_svc_front, cv::Mat& homo_svc_left, cv::Mat& homo_svc_rear, cv::Mat& homo_svc_right){
-    //     PARAMS_.HOMO_SVC_FRONT_ = homo_svc_front;
-    //     fprintf(stderr, "PARAMS_.HOMO_SVC_FRONT_: %s\n", ViwoUtils::CvMat2Str(PARAMS_.HOMO_SVC_FRONT_).c_str());
-    //     PARAMS_.HOMO_SVC_LEFT_ = homo_svc_left;
-    //     fprintf(stderr, "PARAMS_.HOMO_SVC_LEFT_: %s\n", ViwoUtils::CvMat2Str(PARAMS_.HOMO_SVC_LEFT_).c_str());
-    //     PARAMS_.HOMO_SVC_REAR_ = homo_svc_rear;
-    //     fprintf(stderr, "PARAMS_.HOMO_SVC_REAR_: %s\n", ViwoUtils::CvMat2Str(PARAMS_.HOMO_SVC_REAR_).c_str());
-    //     PARAMS_.HOMO_SVC_RIGHT_ = homo_svc_right;
-    //     fprintf(stderr, "PARAMS_.HOMO_SVC_RIGHT_: %s\n", ViwoUtils::CvMat2Str(PARAMS_.HOMO_SVC_RIGHT_).c_str());
-
-    //     GenIpmMasksBow1();
-    // }
+    bool ReadCarModel(std::string car_img_path){
+        cv::Mat car_top_view = cv::imread(car_img_path, cv::IMREAD_COLOR);
+        float h_w_ration = (float)car_top_view.rows / car_top_view.cols;
+        PARAMS_.CAR_MODEL_W_ = int(PARAMS_.SVC_RIGHT_X0_ - PARAMS_.SVC_LEFT_X0_) + 10;
+        // PARAMS_.CAR_MODEL_H_ = int(PARAMS_.SVC_REAR_Y0_ - PARAMS_.SVC_FRONT_Y0_) + 2;
+        PARAMS_.CAR_MODEL_H_ = int(PARAMS_.CAR_MODEL_W_ * h_w_ration);
+        car_top_view_ = psdonnx::PreProcessor::resize(car_top_view, PARAMS_.CAR_MODEL_W_, PARAMS_.CAR_MODEL_H_);
+        PARAMS_.CAR_MODEL_X0_ = (PARAMS_.BEV_W_-PARAMS_.CAR_MODEL_W_)/2 - 1;
+        PARAMS_.CAR_MODEL_Y0_ = (PARAMS_.BEV_H_-PARAMS_.CAR_MODEL_H_)/2 - 1;
+        fprintf(stderr, "car model x: %d, y: %d, w: %d, h: %d\n", PARAMS_.CAR_MODEL_X0_, PARAMS_.CAR_MODEL_Y0_, PARAMS_.CAR_MODEL_W_, PARAMS_.CAR_MODEL_H_);
+        return true;
+    }
 
     void Compose(SvcPairedImages_t& pis, bool debug_save=false, std::string path="./"){
         HANG_STOPWATCH();
@@ -139,6 +104,7 @@ public:
         ipm += tmp;
 
         if(debug_save){
+            AddCarTopview(ipm, car_top_view_);
             std::string tstr = std::to_string(pis.time);
             std::string filepath = path + "/" + tstr + "_ipm.png";
             cv::imwrite(filepath.c_str(), ipm);
@@ -157,6 +123,13 @@ public:
 #endif
         }
     }
+
+    void AddCarTopview(cv::Mat& ipm_img, cv::Mat& car_top_img){
+        cv::Mat ipm_roi = ipm_img(cv::Rect(PARAMS_.CAR_MODEL_X0_, PARAMS_.CAR_MODEL_Y0_, PARAMS_.CAR_MODEL_W_, PARAMS_.CAR_MODEL_H_));
+        cv::Mat mask = cv::Mat::ones(PARAMS_.CAR_MODEL_H_, PARAMS_.CAR_MODEL_W_, CV_8UC1);
+        car_top_img.copyTo(ipm_roi, mask);
+    }
+
 
 private:
     /* 

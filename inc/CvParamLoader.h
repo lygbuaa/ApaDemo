@@ -19,6 +19,10 @@ typedef struct{
     float SVC_REAR_Y0_ = 0.0f;
     float SVC_RIGHT_X0_ = 0.0f;
     float SVC_RIGHT_Y0_ = 0.0f;
+    int CAR_MODEL_W_ = 0;
+    int CAR_MODEL_H_ = 0;
+    int CAR_MODEL_X0_ = 0;
+    int CAR_MODEL_Y0_ = 0;
 }IPM_PARAMS_t;
 
 class CvParamLoader
@@ -30,6 +34,7 @@ public:
     std::string pcr_model_path_;
     std::string psd_model_path_;
     std::string dataset_path_;
+    std::string car_top_image_path_;
 
 private:
     std::string yaml_path_;
@@ -57,7 +62,7 @@ public:
         fs_["bev_w"] >> ipm_params_.BEV_W_;
         fs_["bev_xmax"] >> ipm_params_.BEV_XMAX_;
         fs_["bev_ymax"] >> ipm_params_.BEV_YMAX_;
-        
+
         fs_["svc_front_x0"] >> ipm_params_.SVC_FRONT_X0_;
         fs_["svc_front_y0"] >> ipm_params_.SVC_FRONT_Y0_;
         fs_["svc_left_x0"] >> ipm_params_.SVC_LEFT_X0_;
@@ -84,6 +89,9 @@ public:
 
         fs_["dataset_path"] >> dataset_path_;
         dataset_path_ = project_rootdir_ + dataset_path_;
+
+        fs_["car_top_image_path"] >> car_top_image_path_;
+        car_top_image_path_ = project_rootdir_ + car_top_image_path_;
 
         fprintf(stderr, "dataset_path_: %s, output_path_: %s, pcr_model_path_: %s, psd_model_path_: %s\n", \
             dataset_path_.c_str(), output_path_.c_str(), pcr_model_path_.c_str(), psd_model_path_.c_str());
