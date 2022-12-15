@@ -2,10 +2,29 @@
 
 #include <opencv2/opencv.hpp>
 
+typedef struct{
+    int BEV_H_ = 640;
+    int BEV_W_ = 640;
+    float BEV_XMAX_ = 16.0f;
+    float BEV_YMAX_ = 16.0f;
+    cv::Mat HOMO_SVC_FRONT_;
+    cv::Mat HOMO_SVC_LEFT_;
+    cv::Mat HOMO_SVC_REAR_;
+    cv::Mat HOMO_SVC_RIGHT_;
+    float SVC_FRONT_X0_ = 0.0f;
+    float SVC_FRONT_Y0_ = 0.0f;
+    float SVC_LEFT_X0_ = 0.0f;
+    float SVC_LEFT_Y0_ = 0.0f;
+    float SVC_REAR_X0_ = 0.0f;
+    float SVC_REAR_Y0_ = 0.0f;
+    float SVC_RIGHT_X0_ = 0.0f;
+    float SVC_RIGHT_Y0_ = 0.0f;
+}IPM_PARAMS_t;
+
 class CvParamLoader
 {
 public:
-    cv::Mat homo_svc_front_, homo_svc_left_, homo_svc_rear_, homo_svc_right_;
+    IPM_PARAMS_t ipm_params_;
     std::string project_rootdir_;
     std::string output_path_;
     std::string pcr_model_path_;
@@ -34,10 +53,24 @@ public:
     }
 
     void load_params(){
-        fs_["homo_svc_front"] >> homo_svc_front_;
-        fs_["homo_svc_left"] >> homo_svc_left_;
-        fs_["homo_svc_rear"] >> homo_svc_rear_;
-        fs_["homo_svc_right"] >> homo_svc_right_;
+        fs_["bev_h"] >> ipm_params_.BEV_H_;
+        fs_["bev_w"] >> ipm_params_.BEV_W_;
+        fs_["bev_xmax"] >> ipm_params_.BEV_XMAX_;
+        fs_["bev_ymax"] >> ipm_params_.BEV_YMAX_;
+        
+        fs_["svc_front_x0"] >> ipm_params_.SVC_FRONT_X0_;
+        fs_["svc_front_y0"] >> ipm_params_.SVC_FRONT_Y0_;
+        fs_["svc_left_x0"] >> ipm_params_.SVC_LEFT_X0_;
+        fs_["svc_left_y0"] >> ipm_params_.SVC_LEFT_Y0_;
+        fs_["svc_rear_x0"] >> ipm_params_.SVC_REAR_X0_;
+        fs_["svc_rear_y0"] >> ipm_params_.SVC_REAR_Y0_;
+        fs_["svc_right_x0"] >> ipm_params_.SVC_RIGHT_X0_;
+        fs_["svc_right_y0"] >> ipm_params_.SVC_RIGHT_Y0_;
+
+        fs_["homo_svc_front"] >> ipm_params_.HOMO_SVC_FRONT_;
+        fs_["homo_svc_left"] >> ipm_params_.HOMO_SVC_LEFT_;
+        fs_["homo_svc_rear"] >> ipm_params_.HOMO_SVC_REAR_;
+        fs_["homo_svc_right"] >> ipm_params_.HOMO_SVC_RIGHT_;
 
         fs_["project_rootdir"] >> project_rootdir_;
         fs_["output_path"] >> output_path_;

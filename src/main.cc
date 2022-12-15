@@ -26,25 +26,27 @@ bool is_cuda_avaliable(){
 }
 
 void do_work(){
-    const std::string config_file = "/mnt/c/work/github/ApaDemo/config/ipm_carla_town04.yaml";
+    const std::string config_file = "/mnt/c/work/github/ApaDemo/config/ipm_carla_town04_microlino.yaml";
     CvParamLoader cpl(config_file);
 
     std::unique_ptr<IpmComposer> ptr_ipm_composer(new IpmComposer());
-    ptr_ipm_composer->SetHomography(cpl.homo_svc_front_, cpl.homo_svc_left_, cpl.homo_svc_rear_, cpl.homo_svc_right_);
+    // ptr_ipm_composer->SetHomography(cpl.homo_svc_front_, cpl.homo_svc_left_, cpl.homo_svc_rear_, cpl.homo_svc_right_);
+    ptr_ipm_composer->SetParams(cpl.ipm_params_);
 
     std::unique_ptr<psdonnx::PsdWrapper> ptr_psd_wrapper(new psdonnx::PsdWrapper());
-    ptr_psd_wrapper->load_model(cpl.pcr_model_path_, cpl.psd_model_path_);
+    // ptr_psd_wrapper->load_model(cpl.pcr_model_path_, cpl.psd_model_path_);
 
     std::unique_ptr<psdonnx::JsonDataset> ptr_dataset(new psdonnx::JsonDataset(cpl.dataset_path_));
     ptr_dataset->init_reader();
     SvcPairedImages_t pis;
     while(ptr_dataset->load(pis.time, pis.img_front, pis.img_left, pis.img_right, pis.img_rear)){
         // fprintf(stderr, "load dataset t: %f, h: %d, w: %d\n", pis.time, pis.img_front.rows, pis.img_rear.cols);
-        ptr_ipm_composer->Compose(pis);
+        // ptr_ipm_composer->Compose(pis);
+        ptr_ipm_composer->Compose(pis, true, cpl.output_path_);
         psdonnx::Detections_t det;
 	    std::string psd_save_path = cpl.output_path_ + "/" + std::to_string(pis.time) + "_psd.png";
 	    // ptr_psd_wrapper->run_model(pis.img_ipm, det, true, psd_save_path);
-        ptr_psd_wrapper->run_model(pis.img_ipm, det, false, psd_save_path);
+        // ptr_psd_wrapper->run_model(pis.img_ipm, det, false, psd_save_path);
     }
     ptr_dataset->close_reader();
 }
